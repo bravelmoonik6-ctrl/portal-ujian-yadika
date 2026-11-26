@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Jadwal Ujian Semester - SMK Yadika Kopandakan II</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --border: #e2e8f0;
+      --badge-bg: #eff6ff;
+      --badge-text: #1d4ed8;
+      --success: #0f766e;
+      --danger: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 24px 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header-title p {
+      margin: 0;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-light {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-light:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    .btn-outline.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+    }
+
+    @media (max-width: 820px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text);
+      background: #ffffff;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(29, 78, 216, 0.25);
+      border-color: var(--primary);
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 6px;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status-ok {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .status-err {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .mapel-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .badge {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .meta-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .meta-list li {
+      margin-bottom: 4px;
+      text-transform: capitalize;
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .card-footer {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      background: var(--surface);
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 14px;
+      max-width: 460px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+    }
+
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      text-transform: capitalize;
+    }
+
+    .modal p {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .modal-detail {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 14px;
+    }
+
+    .modal-detail div {
+      margin-bottom: 4px;
+    }
+
+    .modal-detail div:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <h1>Portal Jadwal Ujian Semester</h1>
+        <p>SMK Yadika Kopandakan II • Data Tersinkronisasi Otomatis</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnRefresh" class="btn btn-light" type="button">
+          ↻ Muat Ulang Data
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar" aria-label="Filter dan pencarian jadwal">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Cari mata pelajaran atau guru pengampu..."
+      />
+      <select id="filterHari" aria-label="Filter Hari">
+        <option value="">Semua Hari</option>
+      </select>
+      <select id="filterKelas" aria-label="Filter Kelas">
+        <option value="">Semua Kelas</option>
+      </select>
+      <div class="view-toggle">
+        <button id="btnViewCard" class="btn btn-outline active" type="button">Kartu</button>
+        <button id="btnViewTable" class="btn btn-outline" type="button">Tabel</button>
+      </div>
+    </section>
+
+    <div class="status-bar">
+      <span id="statusText">Mengambil jadwal dari Google Sheets...</span>
+      <span id="countText">0 jadwal</span>
+    </div>
+
+    <section id="viewCard" class="grid"></section>
+
+    <section id="viewTable" class="table-wrap hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Mata Pelajaran</th>
+            <th>Kelas</th>
+            <th>Hari</th>
+            <th>Jam</th>
+            <th>Pengampu</th>
+            <th>Aksi Ujian</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </section>
+
+    <div id="emptyState" class="empty-state hidden">
+      Tidak ada jadwal ujian yang cocok dengan filter atau pencarian saat ini.
+    </div>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2 id="modalMapel">Mata Pelajaran</h2>
+      <p>Pastikan identitas dan jadwal ujian sudah sesuai sebelum membuka tautan ujian.</p>
+      <div class="modal-detail">
+        <div><strong>Kelas:</strong> <span id="modalKelas">-</span></div>
+        <div><strong>Hari & Jam:</strong> <span id="modalWaktu">-</span></div>
+        <div><strong>Guru Pengampu:</strong> <span id="modalPengampu">-</span></div>
+      </div>
+      <div class="modal-actions">
+        <button id="btnTutupModal" class="btn btn-outline" type="button">Batal</button>
+        <a id="btnLanjutUjian" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer">
+          Buka Link Ujian ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzpe01HLxvka_jclf28yZ-U8Lf0MBXU59uYCidQsqSrKykxAZ1B6_6WU869zJ383_sDYQ/exec";
+
+    let semuaJadwal = [];
+    let modeTampilan = "card";
+
+    const searchInput = document.getElementById("searchInput");
+    const filterHari = document.getElementById("filterHari");
+    const filterKelas = document.getElementById("filterKelas");
+    const btnViewCard = document.getElementById("btnViewCard");
+    const btnViewTable = document.getElementById("btnViewTable");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const statusText = document.getElementById("statusText");
+    const countText = document.getElementById("countText");
+    const viewCard = document.getElementById("viewCard");
+    const viewTable = document.getElementById("viewTable");
+    const tableBody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalMapel = document.getElementById("modalMapel");
+    const modalKelas = document.getElementById("modalKelas");
+    const modalWaktu = document.getElementById("modalWaktu");
+    const modalPengampu = document.getElementById("modalPengampu");
+    const btnTutupModal = document.getElementById("btnTutupModal");
+    const btnLanjutUjian = document.getElementById("btnLanjutUjian");
+
+    function normalisasiItem(raw) {
+      const kelasNilai = raw.kelas ?? raw["kelas "] ?? raw.Kelas ?? "";
+      return {
+        id: raw.id ?? raw.Id ?? "",
+        mapel: String(raw.mapel ?? raw.Mapel ?? "").trim(),
+        kelas: String(kelasNilai).trim(),
+        hari: String(raw.hari ?? raw.Hari ?? "").trim(),
+        jam: String(raw.jam ?? raw.Jam ?? "").trim(),
+        pengampu: String(raw.pengampu ?? raw.Pengampu ?? "").trim(),
+        link_ujian: String(raw.link_ujian ?? raw.Link_Ujian ?? "").trim()
+      };
+    }
+
+    function capitalize(str) {
+      return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = String(str ?? "");
+      return div.innerHTML;
+    }
+
+    function isiOpsiFilter(items) {
+      const hariDipilih = filterHari.value;
+      const kelasDipilih = filterKelas.value;
+
+      const daftarHari = [...new Set(items.map((d) => d.hari).filter(Boolean))];
+      const daftarKelas = [...new Set(items.map((d) => d.kelas).filter(Boolean))];
+
+      filterHari.innerHTML = `<option value="">Semua Hari</option>` +
+        daftarHari.map((h) => `<option value="${escapeHtml(h)}">${escapeHtml(capitalize(h))}</option>`).join("");
+
+      filterKelas.innerHTML = `<option value="">Semua Kelas</option>` +
+        daftarKelas.map((k) => `<option value="${escapeHtml(k)}">Kelas ${escapeHtml(k)}</option>`).join("");
+
+      if (daftarHari.includes(hariDipilih)) filterHari.value = hariDipilih;
+      if (daftarKelas.includes(kelasDipilih)) filterKelas.value = kelasDipilih;
+    }
+
+    function bukaModalUjian(item) {
+      modalMapel.textContent = item.mapel || "Mata Pelajaran";
+      modalKelas.textContent = item.kelas || "-";
+      modalWaktu.textContent = `${capitalize(item.hari) || "-"} • ${item.jam || "-"}`;
+      modalPengampu.textContent = item.pengampu || "-";
+
+      if (item.link_ujian) {
+        btnLanjutUjian.href = item.link_ujian;
+        btnLanjutUjian.classList.remove("hidden");
+      } else {
+        btnLanjutUjian.href = "#";
+        btnLanjutUjian.classList.add("hidden");
+      }
+
+      modalBackdrop.classList.remove("hidden");
+    }
+
+    function tutupModalUjian() {
+      modalBackdrop.classList.add("hidden");
+    }
+
+    function saringJadwal() {
+      const kataKunci = searchInput.value.trim().toLowerCase();
+      const hariPilihan = filterHari.value.trim().toLowerCase();
+      const kelasPilihan = filterKelas.value.trim().toLowerCase();
+
+      return semuaJadwal.filter((item) => {
+        const cocokCari =
+          !kataKunci ||
+          item.mapel.toLowerCase().includes(kataKunci) ||
+          item.pengampu.toLowerCase().includes(kataKunci);
+        const cocokHari = !hariPilihan || item.hari.toLowerCase() === hariPilihan;
+        const cocokKelas = !kelasPilihan || item.kelas.toLowerCase() === kelasPilihan;
+        return cocokCari && cocokHari && cocokKelas;
+      });
+    }
+
+    function renderTampilan() {
+      const hasil = saringJadwal();
+      countText.textContent = `${hasil.length} jadwal ditampilkan`;
+
+      if (hasil.length === 0) {
+        viewCard.innerHTML = "";
+        tableBody.innerHTML = "";
+        viewCard.classList.add("hidden");
+        viewTable.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      if (modeTampilan === "card") {
+        viewCard.classList.remove("hidden");
+        viewTable.classList.add("hidden");
+        viewCard.innerHTML = "";
+
+        hasil.forEach((item) => {
+          const kartu = document.createElement("article");
+          kartu.className = "card";
+          kartu.innerHTML = `
+            <div>
+              <div class="card-top">
+                <h2 class="mapel-title">${escapeHtml(item.mapel || "-")}</h2>
+                <span class="badge">Kelas ${escapeHtml(item.kelas || "-")}</span>
+              </div>
+              <ul class="meta-list">
+                <li><span class="meta-label">Hari:</span> ${escapeHtml(item.hari || "-")}</li>
+                <li><span class="meta-label">Jam:</span> ${escapeHtml(item.jam || "-")}</li>
+                <li><span class="meta-label">Pengampu:</span> ${escapeHtml(item.pengampu || "-")}</li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-primary" type="button" style="width:100%; justify-content:center;">
+                Buka Ujian
+              </button>
+            </div>
+          `;
+          kartu.querySelector("button").addEventListener("click", () => bukaModalUjian(item));
+          viewCard.appendChild(kartu);
+        });
+      } else {
+        viewCard.classList.add("hidden");
+        viewTable.classList.remove("hidden");
+        tableBody.innerHTML = "";
+
+        hasil.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td style="font-weight:700; text-transform:capitalize;">${escapeHtml(item.mapel || "-")}</td>
+            <td>${escapeHtml(item.kelas || "-")}</td>
+            <td style="text-transform:capitalize;">${escapeHtml(item.hari || "-")}</td>
+            <td>${escapeHtml(item.jam || "-")}</td>
+            <td style="text-transform:capitalize;">${escapeHtml(item.pengampu || "-")}</td>
+            <td><button class="btn btn-primary" type="button">Buka Ujian</button></td>
+          `;
+          tr.querySelector("button").addEventListener("click", () => bukaModalUjian(item));
+          tableBody.appendChild(tr);
+        });
+      }
+    }
+
+    async function muatJadwal() {
+      statusText.className = "";
+      statusText.textContent = "Menyinkronkan data dari Google Sheets...";
+
+      try {
+        const res = await fetch(URL_WEB_APP);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        semuaJadwal = Array.isArray(json) ? json.map(normalisasiItem) : [];
+        isiOpsiFilter(semuaJadwal);
+        renderTampilan();
+
+        const waktuSekarang = new Date().toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        statusText.className = "status-ok";
+        statusText.textContent = `Terhubung ke Google Sheets • Diperbarui pukul ${waktuSekarang}`;
+      } catch (err) {
+        console.error(err);
+        statusText.className = "status-err";
+        statusText.textContent = "Gagal memuat data dari Google Sheets. Periksa koneksi internet atau akses Web App.";
+        viewCard.innerHTML = "";
+        tableBody.innerHTML = "";
+        emptyState.textContent = "Data jadwal belum dapat dimuat.";
+        emptyState.classList.remove("hidden");
+      }
+    }
+
+    searchInput.addEventListener("input", renderTampilan);
+    filterHari.addEventListener("change", renderTampilan);
+    filterKelas.addEventListener("change", renderTampilan);
+
+    btnViewCard.addEventListener("click", () => {
+      modeTampilan = "card";
+      btnViewCard.classList.add("active");
+      btnViewTable.classList.remove("active");
+      renderTampilan();
+    });
+
+    btnViewTable.addEventListener("click", () => {
+      modeTampilan = "table";
+      btnViewTable.classList.add("active");
+      btnViewCard.classList.remove("active");
+      renderTampilan();
+    });
+
+    btnRefresh.addEventListener("click", muatJadwal);
+    btnTutupModal.addEventListener("click", tutupModalUjian);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) tutupModalUjian();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modalBackdrop.classList.contains("hidden")) {
+        tutupModalUjian();
+      }
+    });
+
+    muatJadwal();
+  </script>
+</body>
+</html>
