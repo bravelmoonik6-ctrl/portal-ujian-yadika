@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portal Jadwal Ujian Semester - SMK Yadika Kopandakan II</title>
-  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/240px-Logo_sekolah_yadika.png" />
+  <link id="faviconLink" rel="icon" type="image/png" href="./logo-yadika.png" />
   <style>
     :root {
       --bg: #f1f5f9;
@@ -612,7 +612,8 @@
       <div class="brand-group">
         <div class="logo-frame">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/500px-Logo_sekolah_yadika.png"
+            id="headerLogo"
+            src="./logo-yadika.png"
             alt="Logo SMK Yadika Kopandakan II"
           />
         </div>
@@ -692,7 +693,8 @@
     <div class="footer-inner">
       <div class="footer-school">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/240px-Logo_sekolah_yadika.png"
+          id="footerLogo"
+          src="./logo-yadika.png"
           alt="Logo Yadika"
         />
         <span>Panitia Ujian • SMK Yadika Kopandakan II</span>
@@ -727,16 +729,20 @@
 
     // Ubah nilai di bawah ini sesuai kebutuhan periode ujian aktif
     const CONFIG_PORTAL = {
+      logoUrl: "./logo-yadika.png", // Upload file logo-yadika.png ke folder utama repo GitHub
       tahunAjaran: "T.A. 2026/2027",
-      semester: "Semester Ganjil", // Contoh: "Semester Ganjil" atau "Semester Genap"
-      jenisUjian: "Penilaian Akhir Semester (PAS)", // Contoh: "UTS", "SAS", "Ujian Sekolah", dll.
-      durasiDefaultMenit: 90 // Dipakai jika kolom jam hanya menulis jam mulai (misal "10.00")
+      semester: "Semester Ganjil",
+      jenisUjian: "Penilaian Akhir Semester (PAS)",
+      durasiDefaultMenit: 90
     };
 
     let semuaJadwal = [];
     let modeTampilan = "card";
     let filterHariIniAktif = false;
 
+    const headerLogo = document.getElementById("headerLogo");
+    const footerLogo = document.getElementById("footerLogo");
+    const faviconLink = document.getElementById("faviconLink");
     const badgeTahunAjaran = document.getElementById("badgeTahunAjaran");
     const badgeSemester = document.getElementById("badgeSemester");
     const badgeJenisUjian = document.getElementById("badgeJenisUjian");
@@ -766,7 +772,30 @@
 
     const NAMA_HARI = ["minggu", "senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
 
+    function pasangLogoFallback(imgEl) {
+      imgEl.addEventListener("error", () => {
+        if (imgEl.dataset.fallbackApplied) return;
+        imgEl.dataset.fallbackApplied = "1";
+        const svg = encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+            <rect width="80" height="80" rx="14" fill="#1d4ed8"/>
+            <text x="40" y="48" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#fde047" text-anchor="middle">SMK</text>
+          </svg>`
+        );
+        imgEl.src = `data:image/svg+xml,${svg}`;
+      });
+    }
+
     function terapkanConfigPortal() {
+      pasangLogoFallback(headerLogo);
+      pasangLogoFallback(footerLogo);
+
+      if (CONFIG_PORTAL.logoUrl) {
+        headerLogo.src = CONFIG_PORTAL.logoUrl;
+        footerLogo.src = CONFIG_PORTAL.logoUrl;
+        if (faviconLink) faviconLink.href = CONFIG_PORTAL.logoUrl;
+      }
+
       badgeTahunAjaran.textContent = CONFIG_PORTAL.tahunAjaran || "-";
       badgeSemester.textContent = CONFIG_PORTAL.semester || "-";
 
