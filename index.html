@@ -210,8 +210,14 @@
       color: #ffffff;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(.disabled) {
       background: var(--primary-hover);
+    }
+
+    .btn-primary.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: not-allowed;
     }
 
     .btn-light {
@@ -264,6 +270,36 @@
       margin: 24px auto;
       padding: 0 16px 40px;
       flex: 1;
+    }
+
+    /* BANNER PENGUMUMAN PANITIA */
+    .announcement {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-left: 4px solid #f59e0b;
+      color: #78350f;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+
+    .announcement-badge {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      margin-top: 1px;
     }
 
     .toolbar {
@@ -586,7 +622,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 12px 14px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font-size: 14px;
     }
 
@@ -596,6 +632,38 @@
 
     .modal-detail div:last-child {
       margin-bottom: 0;
+    }
+
+    .token-box {
+      margin-bottom: 18px;
+    }
+
+    .token-box label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .token-input {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .token-msg {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .token-err {
+      color: var(--danger);
+    }
+
+    .token-ok {
+      color: var(--success);
     }
 
     .modal-actions {
@@ -639,6 +707,11 @@
   </header>
 
   <main>
+    <div id="announcementBox" class="announcement hidden" role="status">
+      <span class="announcement-badge">Pengumuman</span>
+      <span id="announcementText"></span>
+    </div>
+
     <section class="toolbar" aria-label="Filter dan pencarian jadwal">
       <input
         id="searchInput"
@@ -715,6 +788,19 @@
         <div><strong>Status:</strong> <span id="modalStatus">-</span></div>
         <div><strong>Guru Pengampu:</strong> <span id="modalPengampu">-</span></div>
       </div>
+
+      <div id="tokenBox" class="token-box hidden">
+        <label for="tokenInput">Token Ujian dari Pengawas</label>
+        <input
+          id="tokenInput"
+          class="token-input"
+          type="text"
+          autocomplete="off"
+          placeholder="Masukkan token ujian..."
+        />
+        <div id="tokenMsg" class="token-msg"></div>
+      </div>
+
       <div class="modal-actions">
         <button id="btnTutupModal" class="btn btn-outline" type="button">Batal</button>
         <a id="btnLanjutUjian" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer">
@@ -729,16 +815,20 @@
 
     // Ubah nilai di bawah ini sesuai kebutuhan periode ujian aktif
     const CONFIG_PORTAL = {
-      logoUrl: "./logo-yadika.png", // Upload file logo-yadika.png ke folder utama repo GitHub
+      logoUrl: "./logo-yadika.png",
       tahunAjaran: "T.A. 2026/2027",
       semester: "Semester Ganjil",
       jenisUjian: "Penilaian Akhir Semester (PAS)",
-      durasiDefaultMenit: 90
+      durasiDefaultMenit: 90,
+      pengumuman: "Pastikan koneksi internet stabil dan gunakan akun/identitas yang sesuai sebelum memulai ujian.",
+      tokenWajib: false,
+      tokenUjian: "YADIKA26"
     };
 
     let semuaJadwal = [];
     let modeTampilan = "card";
     let filterHariIniAktif = false;
+    let tokenAktifJadwal = "";
 
     const headerLogo = document.getElementById("headerLogo");
     const footerLogo = document.getElementById("footerLogo");
@@ -746,6 +836,8 @@
     const badgeTahunAjaran = document.getElementById("badgeTahunAjaran");
     const badgeSemester = document.getElementById("badgeSemester");
     const badgeJenisUjian = document.getElementById("badgeJenisUjian");
+    const announcementBox = document.getElementById("announcementBox");
+    const announcementText = document.getElementById("announcementText");
 
     const searchInput = document.getElementById("searchInput");
     const btnHariIni = document.getElementById("btnHariIni");
@@ -767,6 +859,9 @@
     const modalWaktu = document.getElementById("modalWaktu");
     const modalStatus = document.getElementById("modalStatus");
     const modalPengampu = document.getElementById("modalPengampu");
+    const tokenBox = document.getElementById("tokenBox");
+    const tokenInput = document.getElementById("tokenInput");
+    const tokenMsg = document.getElementById("tokenMsg");
     const btnTutupModal = document.getElementById("btnTutupModal");
     const btnLanjutUjian = document.getElementById("btnLanjutUjian");
 
@@ -805,6 +900,13 @@
       } else {
         badgeJenisUjian.classList.add("hidden");
       }
+
+      if (CONFIG_PORTAL.pengumuman && CONFIG_PORTAL.pengumuman.trim()) {
+        announcementText.textContent = CONFIG_PORTAL.pengumuman.trim();
+        announcementBox.classList.remove("hidden");
+      } else {
+        announcementBox.classList.add("hidden");
+      }
     }
 
     function normalisasiItem(raw) {
@@ -816,7 +918,8 @@
         hari: String(raw.hari ?? raw.Hari ?? "").trim(),
         jam: String(raw.jam ?? raw.Jam ?? "").trim(),
         pengampu: String(raw.pengampu ?? raw.Pengampu ?? "").trim(),
-        link_ujian: String(raw.link_ujian ?? raw.Link_Ujian ?? "").trim()
+        link_ujian: String(raw.link_ujian ?? raw.Link_Ujian ?? "").trim(),
+        token: String(raw.token ?? raw.Token ?? "").trim()
       };
     }
 
@@ -909,6 +1012,37 @@
       };
     }
 
+    function validasiTokenModal() {
+      if (!CONFIG_PORTAL.tokenWajib) {
+        btnLanjutUjian.classList.remove("disabled");
+        tokenMsg.textContent = "";
+        tokenMsg.className = "token-msg";
+        return true;
+      }
+
+      const inputVal = tokenInput.value.trim().toUpperCase();
+      const targetVal = String(tokenAktifJadwal || "").trim().toUpperCase();
+
+      if (!inputVal) {
+        btnLanjutUjian.classList.add("disabled");
+        tokenMsg.textContent = "Masukkan token ujian terlebih dahulu.";
+        tokenMsg.className = "token-msg token-err";
+        return false;
+      }
+
+      if (inputVal === targetVal) {
+        btnLanjutUjian.classList.remove("disabled");
+        tokenMsg.textContent = "Token valid. Silakan buka link ujian.";
+        tokenMsg.className = "token-msg token-ok";
+        return true;
+      }
+
+      btnLanjutUjian.classList.add("disabled");
+      tokenMsg.textContent = "Token tidak sesuai.";
+      tokenMsg.className = "token-msg token-err";
+      return false;
+    }
+
     function isiOpsiFilter(items) {
       const hariDipilih = filterHari.value;
       const kelasDipilih = filterKelas.value;
@@ -942,7 +1076,22 @@
         btnLanjutUjian.classList.add("hidden");
       }
 
+      tokenAktifJadwal = item.token || CONFIG_PORTAL.tokenUjian || "";
+      tokenInput.value = "";
+
+      if (CONFIG_PORTAL.tokenWajib && item.link_ujian) {
+        tokenBox.classList.remove("hidden");
+        validasiTokenModal();
+      } else {
+        tokenBox.classList.add("hidden");
+        tokenMsg.textContent = "";
+        btnLanjutUjian.classList.remove("disabled");
+      }
+
       modalBackdrop.classList.remove("hidden");
+      if (CONFIG_PORTAL.tokenWajib && item.link_ujian) {
+        setTimeout(() => tokenInput.focus(), 50);
+      }
     }
 
     function tutupModalUjian() {
@@ -1113,6 +1262,13 @@
       btnViewTable.classList.add("active");
       btnViewCard.classList.remove("active");
       renderTampilan();
+    });
+
+    tokenInput.addEventListener("input", validasiTokenModal);
+    btnLanjutUjian.addEventListener("click", (e) => {
+      if (!validasiTokenModal()) {
+        e.preventDefault();
+      }
     });
 
     btnRefresh.addEventListener("click", muatJadwal);
