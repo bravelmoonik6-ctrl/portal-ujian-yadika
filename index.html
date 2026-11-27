@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portal Jadwal Ujian Semester - SMK Yadika Kopandakan II</title>
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/240px-Logo_sekolah_yadika.png" />
   <style>
     :root {
       --bg: #f1f5f9;
@@ -16,6 +17,11 @@
       --badge-bg: #eff6ff;
       --badge-text: #1d4ed8;
       --success: #0f766e;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --warn-border: #fde68a;
       --danger: #b91c1c;
     }
 
@@ -25,17 +31,35 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
     }
 
+    /* BANNER HEADER SEKOLAH */
     header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      background: linear-gradient(135deg, #0b152c 0%, #172554 45%, #1d4ed8 100%);
       color: #ffffff;
-      padding: 24px 16px;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+      padding: 26px 16px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 4px solid #facc15;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .header-inner {
@@ -45,19 +69,93 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex: 1 1 540px;
+    }
+
+    .logo-frame {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(255, 255, 255, 0.22);
+    }
+
+    .logo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-title .yayasan-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fde047;
+      margin-bottom: 2px;
     }
 
     .header-title h1 {
       margin: 0 0 4px;
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
     }
 
     .header-title p {
-      margin: 0;
+      margin: 0 0 10px;
       font-size: 14px;
-      color: #cbd5e1;
+      color: #e2e8f0;
+    }
+
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .info-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #f8fafc;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .info-pill-accent {
+      background: rgba(250, 204, 21, 0.18);
+      border-color: rgba(250, 204, 21, 0.45);
+      color: #fef08a;
+    }
+
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
     }
 
     .header-actions {
@@ -65,6 +163,28 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    @media (max-width: 640px) {
+      .brand-group {
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .logo-frame {
+        width: 62px;
+        height: 62px;
+        border-radius: 12px;
+      }
+      .header-title h1 {
+        font-size: 20px;
+      }
+      .header-actions {
+        width: 100%;
+      }
+      .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     .btn {
@@ -95,13 +215,14 @@
     }
 
     .btn-light {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(4px);
     }
 
     .btn-light:hover {
-      background: rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .btn-outline {
@@ -120,10 +241,29 @@
       border-color: var(--primary);
     }
 
+    .btn-today {
+      background: #eff6ff;
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      white-space: nowrap;
+    }
+
+    .btn-today:hover {
+      background: #dbeafe;
+    }
+
+    .btn-today.active {
+      background: #0f766e;
+      color: #ffffff;
+      border-color: #0f766e;
+    }
+
     main {
+      width: 100%;
       max-width: 1100px;
       margin: 24px auto;
       padding: 0 16px 40px;
+      flex: 1;
     }
 
     .toolbar {
@@ -133,15 +273,39 @@
       padding: 16px;
       margin-bottom: 20px;
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
-      gap: 12px;
+      grid-template-columns: 2fr auto 1fr 1fr auto;
+      gap: 10px;
       align-items: center;
       box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 920px) {
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .toolbar > input {
+        grid-column: 1 / -1;
+      }
+      .view-toggle {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+      }
+    }
+
+    @media (max-width: 560px) {
       .toolbar {
         grid-template-columns: 1fr;
+      }
+      .btn-today {
+        width: 100%;
+        justify-content: center;
+      }
+      .view-toggle {
+        justify-content: stretch;
+      }
+      .view-toggle .btn {
+        flex: 1;
+        justify-content: center;
       }
     }
 
@@ -195,6 +359,7 @@
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
+      border-left: 4px solid var(--border);
       border-radius: 12px;
       padding: 18px;
       display: flex;
@@ -202,6 +367,20 @@
       justify-content: space-between;
       gap: 14px;
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .card.status-live-card {
+      border-left-color: #10b981;
+    }
+
+    .card.status-today-card {
+      border-left-color: #f59e0b;
     }
 
     .card-top {
@@ -218,6 +397,14 @@
       text-transform: capitalize;
     }
 
+    .card-badges {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
     .badge {
       background: var(--badge-bg);
       color: var(--badge-text);
@@ -226,6 +413,33 @@
       padding: 4px 10px;
       border-radius: 999px;
       white-space: nowrap;
+    }
+
+    .sched-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .sched-live {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    .sched-today {
+      background: var(--warn-bg);
+      color: var(--warn);
+      border-color: var(--warn-border);
+    }
+
+    .sched-other {
+      background: #f1f5f9;
+      color: #475569;
+      border-color: #e2e8f0;
     }
 
     .meta-list {
@@ -297,6 +511,44 @@
       display: none !important;
     }
 
+    /* FOOTER SEKOLAH */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 20px 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-school {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer-school img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .footer-note {
+      margin: 0;
+    }
+
+    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -357,10 +609,26 @@
 <body>
   <header>
     <div class="header-inner">
-      <div class="header-title">
-        <h1>Portal Jadwal Ujian Semester</h1>
-        <p>SMK Yadika Kopandakan II • Data Tersinkronisasi Otomatis</p>
+      <div class="brand-group">
+        <div class="logo-frame">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/500px-Logo_sekolah_yadika.png"
+            alt="Logo SMK Yadika Kopandakan II"
+          />
+        </div>
+        <div class="header-title">
+          <span class="yayasan-label">Yayasan Abdi Karya (YADIKA)</span>
+          <h1>Portal Jadwal Ujian</h1>
+          <p>SMK Yadika Kopandakan II • Sistem Informasi Pelaksanaan Ujian</p>
+          <div class="header-badges">
+            <span id="badgeTahunAjaran" class="info-pill">T.A. 2026/2027</span>
+            <span id="badgeSemester" class="info-pill">Semester Ganjil</span>
+            <span id="badgeJenisUjian" class="info-pill info-pill-accent">Penilaian Akhir Semester (PAS)</span>
+            <span class="info-pill"><span class="dot-live"></span>Sinkronisasi Otomatis</span>
+          </div>
+        </div>
       </div>
+
       <div class="header-actions">
         <button id="btnRefresh" class="btn btn-light" type="button">
           ↻ Muat Ulang Data
@@ -376,6 +644,9 @@
         type="search"
         placeholder="Cari mata pelajaran atau guru pengampu..."
       />
+      <button id="btnHariIni" class="btn btn-today" type="button">
+        Hari Ini
+      </button>
       <select id="filterHari" aria-label="Filter Hari">
         <option value="">Semua Hari</option>
       </select>
@@ -404,6 +675,7 @@
             <th>Hari</th>
             <th>Jam</th>
             <th>Pengampu</th>
+            <th>Status</th>
             <th>Aksi Ujian</th>
           </tr>
         </thead>
@@ -416,6 +688,21 @@
     </div>
   </main>
 
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-school">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Logo_sekolah_yadika.png/240px-Logo_sekolah_yadika.png"
+          alt="Logo Yadika"
+        />
+        <span>Panitia Ujian • SMK Yadika Kopandakan II</span>
+      </div>
+      <p class="footer-note">
+        Harap hadir 15 menit sebelum ujian dimulai. Hubungi pengawas/proktor ruang jika terjadi kendala akses.
+      </p>
+    </div>
+  </footer>
+
   <div id="modalBackdrop" class="modal-backdrop hidden" role="dialog" aria-modal="true">
     <div class="modal">
       <h2 id="modalMapel">Mata Pelajaran</h2>
@@ -423,6 +710,7 @@
       <div class="modal-detail">
         <div><strong>Kelas:</strong> <span id="modalKelas">-</span></div>
         <div><strong>Hari & Jam:</strong> <span id="modalWaktu">-</span></div>
+        <div><strong>Status:</strong> <span id="modalStatus">-</span></div>
         <div><strong>Guru Pengampu:</strong> <span id="modalPengampu">-</span></div>
       </div>
       <div class="modal-actions">
@@ -437,10 +725,24 @@
   <script>
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzpe01HLxvka_jclf28yZ-U8Lf0MBXU59uYCidQsqSrKykxAZ1B6_6WU869zJ383_sDYQ/exec";
 
+    // Ubah nilai di bawah ini sesuai kebutuhan periode ujian aktif
+    const CONFIG_PORTAL = {
+      tahunAjaran: "T.A. 2026/2027",
+      semester: "Semester Ganjil", // Contoh: "Semester Ganjil" atau "Semester Genap"
+      jenisUjian: "Penilaian Akhir Semester (PAS)", // Contoh: "UTS", "SAS", "Ujian Sekolah", dll.
+      durasiDefaultMenit: 90 // Dipakai jika kolom jam hanya menulis jam mulai (misal "10.00")
+    };
+
     let semuaJadwal = [];
     let modeTampilan = "card";
+    let filterHariIniAktif = false;
+
+    const badgeTahunAjaran = document.getElementById("badgeTahunAjaran");
+    const badgeSemester = document.getElementById("badgeSemester");
+    const badgeJenisUjian = document.getElementById("badgeJenisUjian");
 
     const searchInput = document.getElementById("searchInput");
+    const btnHariIni = document.getElementById("btnHariIni");
     const filterHari = document.getElementById("filterHari");
     const filterKelas = document.getElementById("filterKelas");
     const btnViewCard = document.getElementById("btnViewCard");
@@ -457,9 +759,24 @@
     const modalMapel = document.getElementById("modalMapel");
     const modalKelas = document.getElementById("modalKelas");
     const modalWaktu = document.getElementById("modalWaktu");
+    const modalStatus = document.getElementById("modalStatus");
     const modalPengampu = document.getElementById("modalPengampu");
     const btnTutupModal = document.getElementById("btnTutupModal");
     const btnLanjutUjian = document.getElementById("btnLanjutUjian");
+
+    const NAMA_HARI = ["minggu", "senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
+
+    function terapkanConfigPortal() {
+      badgeTahunAjaran.textContent = CONFIG_PORTAL.tahunAjaran || "-";
+      badgeSemester.textContent = CONFIG_PORTAL.semester || "-";
+
+      if (CONFIG_PORTAL.jenisUjian) {
+        badgeJenisUjian.textContent = CONFIG_PORTAL.jenisUjian;
+        badgeJenisUjian.classList.remove("hidden");
+      } else {
+        badgeJenisUjian.classList.add("hidden");
+      }
+    }
 
     function normalisasiItem(raw) {
       const kelasNilai = raw.kelas ?? raw["kelas "] ?? raw.Kelas ?? "";
@@ -484,6 +801,85 @@
       return div.innerHTML;
     }
 
+    function getNamaHariIni() {
+      return NAMA_HARI[new Date().getDay()];
+    }
+
+    function parseJamKeMenit(teksJam) {
+      const match = String(teksJam || "").match(/(\d{1,2})[:.](\d{2})/);
+      if (!match) return null;
+      const jam = Number(match[1]);
+      const menit = Number(match[2]);
+      if (jam > 23 || menit > 59) return null;
+      return jam * 60 + menit;
+    }
+
+    function evaluasiStatusJadwal(item) {
+      const sekarang = new Date();
+      const hariIni = getNamaHariIni();
+      const hariJadwal = String(item.hari || "").trim().toLowerCase();
+      const menitSekarang = sekarang.getHours() * 60 + sekarang.getMinutes();
+
+      const cocokHariIni = hariJadwal === hariIni;
+      const rentangMatch = String(item.jam || "").match(
+        /(\d{1,2}[:.]\d{2})\s*(?:-|–|—|s\/d|sampai)\s*(\d{1,2}[:.]\d{2})/i
+      );
+
+      let mulaiMenit = null;
+      let selesaiMenit = null;
+
+      if (rentangMatch) {
+        mulaiMenit = parseJamKeMenit(rentangMatch[1]);
+        selesaiMenit = parseJamKeMenit(rentangMatch[2]);
+      } else {
+        mulaiMenit = parseJamKeMenit(item.jam);
+        if (mulaiMenit !== null) {
+          selesaiMenit = mulaiMenit + (Number(CONFIG_PORTAL.durasiDefaultMenit) || 90);
+        }
+      }
+
+      if (cocokHariIni && mulaiMenit !== null && selesaiMenit !== null) {
+        if (menitSekarang >= mulaiMenit && menitSekarang <= selesaiMenit) {
+          return {
+            code: "live",
+            label: "Sedang Berlangsung",
+            badgeClass: "sched-live",
+            cardClass: "status-live-card"
+          };
+        }
+        if (menitSekarang < mulaiMenit) {
+          return {
+            code: "today",
+            label: "Hari Ini • Belum Mulai",
+            badgeClass: "sched-today",
+            cardClass: "status-today-card"
+          };
+        }
+        return {
+          code: "done",
+          label: "Hari Ini • Selesai",
+          badgeClass: "sched-other",
+          cardClass: ""
+        };
+      }
+
+      if (cocokHariIni) {
+        return {
+          code: "today",
+          label: "Jadwal Hari Ini",
+          badgeClass: "sched-today",
+          cardClass: "status-today-card"
+        };
+      }
+
+      return {
+        code: "other",
+        label: capitalize(item.hari) || "Terjadwal",
+        badgeClass: "sched-other",
+        cardClass: ""
+      };
+    }
+
     function isiOpsiFilter(items) {
       const hariDipilih = filterHari.value;
       const kelasDipilih = filterKelas.value;
@@ -502,9 +898,11 @@
     }
 
     function bukaModalUjian(item) {
+      const st = evaluasiStatusJadwal(item);
       modalMapel.textContent = item.mapel || "Mata Pelajaran";
       modalKelas.textContent = item.kelas || "-";
       modalWaktu.textContent = `${capitalize(item.hari) || "-"} • ${item.jam || "-"}`;
+      modalStatus.textContent = st.label;
       modalPengampu.textContent = item.pengampu || "-";
 
       if (item.link_ujian) {
@@ -522,9 +920,22 @@
       modalBackdrop.classList.add("hidden");
     }
 
+    function sinkronTombolHariIni() {
+      const hariIni = getNamaHariIni();
+      if (filterHariIniAktif) {
+        btnHariIni.classList.add("active");
+        btnHariIni.textContent = `✓ Hari Ini (${capitalize(hariIni)})`;
+      } else {
+        btnHariIni.classList.remove("active");
+        btnHariIni.textContent = "Hari Ini";
+      }
+    }
+
     function saringJadwal() {
       const kataKunci = searchInput.value.trim().toLowerCase();
-      const hariPilihan = filterHari.value.trim().toLowerCase();
+      const hariPilihan = filterHariIniAktif
+        ? getNamaHariIni()
+        : filterHari.value.trim().toLowerCase();
       const kelasPilihan = filterKelas.value.trim().toLowerCase();
 
       return semuaJadwal.filter((item) => {
@@ -559,13 +970,17 @@
         viewCard.innerHTML = "";
 
         hasil.forEach((item) => {
+          const st = evaluasiStatusJadwal(item);
           const kartu = document.createElement("article");
-          kartu.className = "card";
+          kartu.className = `card ${st.cardClass}`;
           kartu.innerHTML = `
             <div>
               <div class="card-top">
                 <h2 class="mapel-title">${escapeHtml(item.mapel || "-")}</h2>
-                <span class="badge">Kelas ${escapeHtml(item.kelas || "-")}</span>
+                <div class="card-badges">
+                  <span class="badge">Kelas ${escapeHtml(item.kelas || "-")}</span>
+                  <span class="sched-tag ${st.badgeClass}">${escapeHtml(st.label)}</span>
+                </div>
               </div>
               <ul class="meta-list">
                 <li><span class="meta-label">Hari:</span> ${escapeHtml(item.hari || "-")}</li>
@@ -588,6 +1003,7 @@
         tableBody.innerHTML = "";
 
         hasil.forEach((item) => {
+          const st = evaluasiStatusJadwal(item);
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td style="font-weight:700; text-transform:capitalize;">${escapeHtml(item.mapel || "-")}</td>
@@ -595,6 +1011,7 @@
             <td style="text-transform:capitalize;">${escapeHtml(item.hari || "-")}</td>
             <td>${escapeHtml(item.jam || "-")}</td>
             <td style="text-transform:capitalize;">${escapeHtml(item.pengampu || "-")}</td>
+            <td><span class="sched-tag ${st.badgeClass}">${escapeHtml(st.label)}</span></td>
             <td><button class="btn btn-primary" type="button">Buka Ujian</button></td>
           `;
           tr.querySelector("button").addEventListener("click", () => bukaModalUjian(item));
@@ -635,7 +1052,24 @@
     }
 
     searchInput.addEventListener("input", renderTampilan);
-    filterHari.addEventListener("change", renderTampilan);
+
+    btnHariIni.addEventListener("click", () => {
+      filterHariIniAktif = !filterHariIniAktif;
+      if (filterHariIniAktif) {
+        filterHari.value = "";
+      }
+      sinkronTombolHariIni();
+      renderTampilan();
+    });
+
+    filterHari.addEventListener("change", () => {
+      if (filterHari.value) {
+        filterHariIniAktif = false;
+        sinkronTombolHariIni();
+      }
+      renderTampilan();
+    });
+
     filterKelas.addEventListener("change", renderTampilan);
 
     btnViewCard.addEventListener("click", () => {
@@ -663,6 +1097,8 @@
       }
     });
 
+    terapkanConfigPortal();
+    sinkronTombolHariIni();
     muatJadwal();
   </script>
 </body>
