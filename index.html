@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portal Jadwal Ujian Semester - SMA Yadika Kopandakan II</title>
+  <title>Portal Jadwal Ujian Semester - SMK/SMA Yadika Kopandakan II</title>
   <link id="faviconLink" rel="icon" type="image/png" href="./logo-yadika.png" />
   <style>
     :root {
@@ -682,13 +682,13 @@
           <img
             id="headerLogo"
             src="./logo-yadika.png"
-            alt="Logo SMA Yadika Kopandakan II"
+            alt="Logo SMK/SMA Yadika Kopandakan II"
           />
         </div>
         <div class="header-title">
           <span class="yayasan-label">Yayasan Abdi Karya (YADIKA)</span>
           <h1>Portal Jadwal Ujian</h1>
-          <p>SMA Yadika Kopandakan II • Sistem Informasi Pelaksanaan Ujian</p>
+          <p>SMK/SMA Yadika Kopandakan II • Sistem Informasi Pelaksanaan Ujian</p>
           <div class="header-badges">
             <span id="badgeTahunAjaran" class="info-pill">T.A. 2026/2027</span>
             <span id="badgeSemester" class="info-pill">Semester Ganjil</span>
@@ -770,7 +770,7 @@
           src="./logo-yadika.png"
           alt="Logo Yadika"
         />
-        <span>Panitia Ujian • SMA Yadika Kopandakan II</span>
+        <span>Panitia Ujian • SMK/SMA Yadika Kopandakan II</span>
       </div>
       <p class="footer-note">
         Harap hadir 15 menit sebelum ujian dimulai. Hubungi pengawas/proktor ruang jika terjadi kendala akses.
@@ -874,7 +874,7 @@
         const svg = encodeURIComponent(
           `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
             <rect width="80" height="80" rx="14" fill="#1d4ed8"/>
-            <text x="40" y="48" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#fde047" text-anchor="middle">SMA</text>
+            <text x="40" y="48" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#fde047" text-anchor="middle">YADIKA</text>
           </svg>`
         );
         imgEl.src = `data:image/svg+xml,${svg}`;
@@ -1126,3 +1126,176 @@
         return cocokCari && cocokHari && cocokKelas;
       });
     }
+
+    function renderTampilan() {
+      const hasil = saringJadwal();
+      countText.textContent = `${hasil.length} jadwal ditampilkan`;
+
+      if (hasil.length === 0) {
+        viewCard.innerHTML = "";
+        tableBody.innerHTML = "";
+        viewCard.classList.add("hidden");
+        viewTable.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      if (modeTampilan === "card") {
+        viewCard.classList.remove("hidden");
+        viewTable.classList.add("hidden");
+        viewCard.innerHTML = "";
+
+        hasil.forEach((item) => {
+          const st = evaluasiStatusJadwal(item);
+          const kartu = document.createElement("article");
+          kartu.className = `card ${st.cardClass}`;
+          kartu.innerHTML = `
+            <div>
+              <div class="card-top">
+                <h2 class="mapel-title">${escapeHtml(item.mapel || "-")}</h2>
+                <div class="card-badges">
+                  <span class="badge">Kelas ${escapeHtml(item.kelas || "-")}</span>
+                  <span class="sched-tag ${st.badgeClass}">${escapeHtml(st.label)}</span>
+                </div>
+              </div>
+              <ul class="meta-list">
+                <li><span class="meta-label">Hari:</span> ${escapeHtml(item.hari || "-")}</li>
+                <li><span class="meta-label">Jam:</span> ${escapeHtml(item.jam || "-")}</li>
+                <li><span class="meta-label">Pengampu:</span> ${escapeHtml(item.pengampu || "-")}</li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-primary btn-buka-ujian" type="button" style="width:100%; justify-content:center;">
+                Buka Ujian
+              </button>
+            </div>
+          `;
+          kartu.querySelector(".btn-buka-ujian").addEventListener("click", () => bukaModalUjian(item));
+          viewCard.appendChild(kartu);
+        });
+      } else {
+        viewCard.classList.add("hidden");
+        viewTable.classList.remove("hidden");
+        tableBody.innerHTML = "";
+
+        hasil.forEach((item) => {
+          const st = evaluasiStatusJadwal(item);
+          const baris = document.createElement("tr");
+          baris.innerHTML = `
+            <td><strong>${escapeHtml(item.mapel || "-")}</strong></td>
+            <td>${escapeHtml(item.kelas || "-")}</td>
+            <td>${escapeHtml(capitalize(item.hari) || "-")}</td>
+            <td>${escapeHtml(item.jam || "-")}</td>
+            <td>${escapeHtml(item.pengampu || "-")}</td>
+            <td><span class="sched-tag ${st.badgeClass}">${escapeHtml(st.label)}</span></td>
+            <td>
+              <button class="btn btn-primary btn-buka-ujian" type="button">
+                Buka Ujian
+              </button>
+            </td>
+          `;
+          baris.querySelector(".btn-buka-ujian").addEventListener("click", () => bukaModalUjian(item));
+          tableBody.appendChild(baris);
+        });
+      }
+    }
+
+    async function muatJadwal() {
+      statusText.textContent = "Mengambil jadwal dari Google Sheets...";
+      statusText.className = "";
+
+      try {
+        const res = await fetch(`${URL_WEB_APP}?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const daftarMentah = Array.isArray(data) ? data : (data.data || []);
+
+        semuaJadwal = daftarMentah
+          .map(normalisasiItem)
+          .filter((item) => item.mapel || item.kelas || item.hari || item.jam);
+
+        isiOpsiFilter(semuaJadwal);
+        renderTampilan();
+
+        const jamUpdate = new Date().toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        statusText.textContent = `Terhubung ke Google Sheets • Diperbarui pukul ${jamUpdate}`;
+        statusText.className = "status-ok";
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "Gagal memuat jadwal dari Google Sheets. Coba muat ulang.";
+        statusText.className = "status-err";
+        countText.textContent = "0 jadwal ditampilkan";
+        viewCard.innerHTML = "";
+        tableBody.innerHTML = "";
+        emptyState.classList.remove("hidden");
+      }
+    }
+
+    searchInput.addEventListener("input", renderTampilan);
+
+    btnHariIni.addEventListener("click", () => {
+      filterHariIniAktif = !filterHariIniAktif;
+      if (filterHariIniAktif) {
+        filterHari.value = "";
+      }
+      sinkronTombolHariIni();
+      renderTampilan();
+    });
+
+    filterHari.addEventListener("change", () => {
+      if (filterHari.value) {
+        filterHariIniAktif = false;
+        sinkronTombolHariIni();
+      }
+      renderTampilan();
+    });
+
+    filterKelas.addEventListener("change", renderTampilan);
+
+    btnViewCard.addEventListener("click", () => {
+      modeTampilan = "card";
+      btnViewCard.classList.add("active");
+      btnViewTable.classList.remove("active");
+      renderTampilan();
+    });
+
+    btnViewTable.addEventListener("click", () => {
+      modeTampilan = "table";
+      btnViewTable.classList.add("active");
+      btnViewCard.classList.remove("active");
+      renderTampilan();
+    });
+
+    btnRefresh.addEventListener("click", muatJadwal);
+    btnTutupModal.addEventListener("click", tutupModalUjian);
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) tutupModalUjian();
+    });
+
+    tokenInput.addEventListener("input", validasiTokenModal);
+
+    btnLanjutUjian.addEventListener("click", (e) => {
+      if (CONFIG_PORTAL.tokenWajib && !validasiTokenModal()) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modalBackdrop.classList.contains("hidden")) {
+        tutupModalUjian();
+      }
+    });
+
+    terapkanConfigPortal();
+    sinkronTombolHariIni();
+    muatJadwal();
+  </script>
+</body>
+</html>
